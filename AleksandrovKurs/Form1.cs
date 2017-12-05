@@ -57,13 +57,14 @@ namespace AleksandrovKurs
             bool servers_full;
 
             CmoModel cmo = new CmoModel();
+            setupVars(cmo);
 
             Random r = new Random();
 
             while(time <= max_time) // поменять на 3600
             {
                 servers_full = true;
-                task_interval = GetRandomNumber(0.3, 0.6);             // промежуток прихода задачи
+                task_interval = GetRandomNumber(cmo.Tzmin, cmo.Tzmax);             // промежуток прихода задачи
                 time += task_interval;
                 tasks++;                                           // всего задач
 
@@ -77,7 +78,7 @@ namespace AleksandrovKurs
                 {
                     if (servers[i] <= 0)
                     {
-                        task_finish_time = GetRandomNumber(1.0, 6.0);   // время обработки задачи
+                        task_finish_time = GetRandomNumber(cmo.Tsmin, cmo.Tsmax);   // время обработки задачи
                         servers[i] = task_finish_time;
                         tasks_finished++;                               // обработанные задачи
                         servers_full = false;
@@ -207,10 +208,10 @@ namespace AleksandrovKurs
 
         private void setupVars(CmoModel cmo)
         {
-            cmo.Tzmax = 1 / 3;
-            cmo.Tzmin = 2 / 3;
-            cmo.Tzmax = 1;
-            cmo.Tzmin = 6;
+            cmo.Tzmax = 0.333;
+            cmo.Tzmin = 0.666;
+            cmo.Tsmax = 6.0;
+            cmo.Tsmin = 1.0;
  
         }
 
