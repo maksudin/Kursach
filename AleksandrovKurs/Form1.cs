@@ -13,7 +13,7 @@ namespace AleksandrovKurs
     public partial class Form1 : Form
     {
 
-        private const double max_time = 3600;
+        private const double max_time = 60;    // поменять на 3600 
 
         public class CmoModel
         {
@@ -51,6 +51,7 @@ namespace AleksandrovKurs
         {
             richTextBox1.Clear();
             double[] servers = {0, 0, 0};
+            Stack<Double> buffer = new Stack<double>;
             double time = 0, task_interval = 0, task_finish_time = 0;
             int tasks_denied = 0, tasks_finished = 0, tasks = 0;
             double time_finish_sum = 0;
@@ -60,12 +61,12 @@ namespace AleksandrovKurs
 
             Random r = new Random();
 
-            while(time <= max_time) // поменять на 3600
+            while(time <= max_time) 
             {
                 servers_full = true;
-                task_interval = GetRandomNumber(0.3, 0.6);             // промежуток прихода задачи
+                task_interval = GetRandomNumber(0.5, 0.83);             // промежуток прихода задачи
                 time += task_interval;
-                tasks++;                                           // всего задач
+                tasks++;                                                // всего задач
 
 
                 for(int i = 0; i < 3; i++)
@@ -73,11 +74,19 @@ namespace AleksandrovKurs
                     servers[i] -= task_interval;
                 }
 
+
                 for(int i = 0; i < 3; i++)
                 {
                     if (servers[i] <= 0)
                     {
-                        task_finish_time = GetRandomNumber(1.0, 6.0);   // время обработки задачи
+                        if (buffer.Count < 0)
+                        {
+                            task_finish_time = GetRandomNumber(1.0, 5.0);   // время обработки задачи
+                        }
+                        else
+                        {
+                            task_finish_time = buffer.Pop();
+                        }
                         servers[i] = task_finish_time;
                         tasks_finished++;                               // обработанные задачи
                         servers_full = false;
@@ -88,6 +97,10 @@ namespace AleksandrovKurs
 
                 if (servers_full == true)
                 {
+                    if (buffer.Count < 3)
+                    {
+                        buffer.Push(task_finish_time);
+                    }
                     tasks_denied++;                                     // необработанные задачи
                 }
             }
@@ -122,6 +135,10 @@ namespace AleksandrovKurs
             richTextBox1.AppendText(String.Format("S={0:0.0000}" + " задач/сек\n", cmo.s));
             richTextBox1.AppendText(String.Format("Pотк={0:0.0000}\n", cmo.p_denied));
             richTextBox1.AppendText(String.Format("K={0:0.0000}\n ", cmo.k));
+            richTextBox1.AppendText(String.Format("Nпрог={0:0.0000}\n ", cmo.k));
+            richTextBox1.AppendText(String.Format("Tпрог={0:0.0000}\n ", cmo.k));
+            richTextBox1.AppendText(String.Format("Nбуф={0:0.0000}\n ", cmo.k));
+            richTextBox1.AppendText(String.Format("Tбуф={0:0.0000}\n ", cmo.k));
         }
 
 
