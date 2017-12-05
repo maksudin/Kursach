@@ -64,7 +64,8 @@ namespace AleksandrovKurs
             while(time <= max_time) // поменять на 3600
             {
                 servers_full = true;
-                task_interval = GetRandomNumber(cmo.Tzmin, cmo.Tzmax);             // промежуток прихода задачи
+                task_interval = r.NextDouble() * (cmo.Tzmax - cmo.Tzmin) + cmo.Tzmin;             // промежуток прихода задачи
+                Console.WriteLine(task_interval);
                 time += task_interval;
                 tasks++;                                           // всего задач
 
@@ -78,7 +79,7 @@ namespace AleksandrovKurs
                 {
                     if (servers[i] <= 0)
                     {
-                        task_finish_time = GetRandomNumber(cmo.Tsmin, cmo.Tsmax);   // время обработки задачи
+                        task_finish_time = r.NextDouble() * (cmo.Tsmax - cmo.Tsmin) + cmo.Tsmin;   // время обработки задачи
                         servers[i] = task_finish_time;
                         tasks_finished++;                               // обработанные задачи
                         servers_full = false;
@@ -158,7 +159,6 @@ namespace AleksandrovKurs
                     {
                         v = r.NextDouble();                                         // время обработки задачи
                         task_finish_time = Math.Log10(1 - v) / (-3) * 3;            // домнажаем ещё на 3 чтобы распределение было от 0 до 4 
-                        Console.WriteLine(task_finish_time);                        // и да экспонента бывает и больше единицы иногда
                         servers[i] = task_finish_time;
                         tasks_finished++;                                           // обработанные задачи
                         servers_full = false;
@@ -208,8 +208,8 @@ namespace AleksandrovKurs
 
         private void setupVars(CmoModel cmo)
         {
-            cmo.Tzmax = 0.333;
-            cmo.Tzmin = 0.666;
+            cmo.Tzmax = 0.3;
+            cmo.Tzmin = 0.6;
             cmo.Tsmax = 6.0;
             cmo.Tsmin = 1.0;
  
