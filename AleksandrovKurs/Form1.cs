@@ -207,10 +207,10 @@ namespace AleksandrovKurs
 
         private void setupVars(CmoModel cmo)
         {
-            cmo.Tzmax = 1 / 3;
-            cmo.Tzmin = 2 / 3;
-            cmo.Tzmax = 1;
-            cmo.Tzmin = 6;
+            cmo.Tzmax = 5 / 6;
+            cmo.Tzmin = 1 / 2;
+            cmo.Tsmax = 1;
+            cmo.Tsmin = 5;
  
         }
 
