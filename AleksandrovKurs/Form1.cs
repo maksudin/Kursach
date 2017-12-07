@@ -13,7 +13,7 @@ namespace AleksandrovKurs
     public partial class Form1 : Form
     {
 
-        private const double max_time = 10;    // поменять на 3600 
+        private const double max_time = 3600;    // поменять на 3600 
 
         public class CmoModel
         {
@@ -50,7 +50,7 @@ namespace AleksandrovKurs
         private void button1_Click(object sender, EventArgs e)
         {
             richTextBox1.Clear();
-            double[] servers = {0, 0, 0};
+            double[] servers = { 0, 0, 0 };
             Queue<Double> buffer = new Queue<Double>();
             double time = 0, task_interval = 0, task_finish_time = 0;
             int tasks_denied = 0, tasks_finished = 0, tasks = 0;
@@ -58,52 +58,54 @@ namespace AleksandrovKurs
             bool servers_full;
 
             CmoModel cmo = new CmoModel();
-
             Random r = new Random();
+            setupVars(cmo);
 
-            while(time <= max_time) 
+            while (time <= max_time)
             {
                 servers_full = true;
-                task_interval = GetRandomNumber(0.5, 0.83);             // промежуток прихода задачи
+                task_interval = r.NextDouble() * (cmo.Tzmax - cmo.Tzmin) + cmo.Tzmin;             // промежуток прихода задачи
                 //Console.WriteLine("task_interval=" + task_interval);
                 time += task_interval;
                 tasks++;                                                // всего задач
 
 
-                //Console.WriteLine("servers:");
+                Console.WriteLine("servers:");
                 for (int i = 0; i < 3; i++)
                 {
                     servers[i] -= task_interval;
-                    //Console.Write(" " + servers[i]);
-                    task_finish_time = GetRandomNumber(0.5, 0.83);   // время обработки задачи
-                    Console.WriteLine(" " + task_finish_time);
+                    Console.Write(" " + servers[i]);
                 }
-                //Console.WriteLine();
+                Console.WriteLine();
 
 
                 for(int i = 0; i < 3; i++)
                 {
                     if (servers[i] <= 0)
                     {
+                        Console.WriteLine("i=" + i);
+                        Console.WriteLine("Count=" + buffer.Count);
                         if (buffer.Count == 0)
                         {
-                            task_finish_time = GetRandomNumber(1.0, 5.0);   // время обработки задачи
-                            //Console.WriteLine("task_finish_time=" + task_finish_time);
+                            task_finish_time = r.NextDouble() * (cmo.Tsmax - cmo.Tsmin) + cmo.Tsmin;   // время обработки задачи
                         }
                         else
                         {
                             task_finish_time = buffer.Dequeue();
                             //Console.WriteLine("buffer:");
-                            foreach(Double buf in buffer)
+
+                            Console.WriteLine("buffer:");
+                            foreach (Double buf in buffer)
                             {
-                                //Console.Write(" " + buf);
+                                Console.Write(" " + buf);
                             }
-                            //Console.WriteLine();
+                            Console.WriteLine();
                         }
+
+                        Console.WriteLine("task_finish_time=" + task_finish_time);
                         servers[i] = task_finish_time;
-                        tasks_finished++;                               // обработанные задачи
+                        tasks_finished++;                                                              // обработанные задачи
                         servers_full = false;
-                        time_finish_sum += task_finish_time;
                         break;
                     }
                 }
@@ -112,22 +114,24 @@ namespace AleksandrovKurs
                 {
                     if (buffer.Count < 3)
                     {
+                        task_finish_time = r.NextDouble() * (cmo.Tsmax - cmo.Tsmin) + cmo.Tsmin;   // время обработки задачи
                         buffer.Enqueue(task_finish_time);
-                        //Console.WriteLine("buffer:");
+                        Console.WriteLine("buffer:");
                         foreach (Double buf in buffer)
                         {
-                            //Console.Write(" " + buf);
+                            Console.Write(" " + buf);
                         }
-                        //Console.WriteLine();
+                        Console.WriteLine();
                     }
-                    tasks_denied++;                                     // необработанные задачи
+                    tasks_denied++;                                                                 // необработанные задачи
                 }
+                time_finish_sum += task_finish_time;
             }
 
             cmo.l = tasks / max_time;
-            cmo.Tobr = time_finish_sum / tasks;                         // среднее время обработки
-            cmo.m = 1 / cmo.Tobr;                                       // интенсивность потока обслуживания
-            double P = cmo.l / cmo.m;                                   // Интенсивность загрузки = лямбда(2) / M
+            cmo.Tobr = time_finish_sum / tasks;                                                     // среднее время обработки
+            cmo.m = 1 / cmo.Tobr;                                                                   // интенсивность потока обслуживания
+            double P = cmo.l / cmo.m;                                                               // Интенсивность загрузки = лямбда(2) / M
             cmo.p0 = Math.Pow( ( 1 + P + (Math.Pow(P, 2) / 2) + (Math.Pow(P, 3) / 6) ), -1);
             cmo.p1 = P * cmo.p0;
             cmo.p2 = Math.Pow(P, 2) / 2 * cmo.p0;
@@ -158,7 +162,9 @@ namespace AleksandrovKurs
             richTextBox1.AppendText(String.Format("Tпрог={0:0.0000}\n ", cmo.k));
             richTextBox1.AppendText(String.Format("Nбуф={0:0.0000}\n ", cmo.k));
             richTextBox1.AppendText(String.Format("Tбуф={0:0.0000}\n ", cmo.k));
-        }
+            
+            }
+        
 
 
         private void button2_Click(object sender, EventArgs e)
@@ -243,20 +249,12 @@ namespace AleksandrovKurs
 
         private void setupVars(CmoModel cmo)
         {
-            cmo.Tzmax = 5 / 6;
-            cmo.Tzmin = 1 / 2;
-            cmo.Tsmax = 1;
-            cmo.Tsmin = 5;
+            cmo.Tzmax = 0.83;
+            cmo.Tzmin = 0.5;
+            cmo.Tsmax = 1.00;
+            cmo.Tsmin = 5.00;
  
         }
-
-        // Helper methods
-        public double GetRandomNumber(double minimum, double maximum)
-        {
-            Random random = new Random();
-            return random.NextDouble() * (maximum - minimum) + minimum;
-        }
-
 
         // Unneccessary methods
         private void label1_Click(object sender, EventArgs e)
